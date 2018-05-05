@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mkdir -p deps
+
+git clone https://github.com/arangodb/velocypack.git deps/velocypack

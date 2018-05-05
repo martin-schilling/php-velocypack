@@ -1,0 +1,19 @@
+version: '3'
+services:
+  extension-builder:
+    image: extension-builder
+    build:
+      context: ./
+      dockerfile: Dockerfile.builder
+    volumes:
+      - "./:/app"
+
+  php:
+    image: extension-php
+    depends_on:
+      - extension-builder
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - "./:/app"
