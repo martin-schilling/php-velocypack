@@ -19,6 +19,14 @@ namespace velocypack { namespace php {
         return (Vpack *)((char *)obj - XtOffsetOf(Vpack, std));
     }
 
+    void Vpack::from_binary(const char* binary, size_t size)
+    {
+        vp::Buffer<uint8_t>* buffer = new vp::Buffer<uint8_t>();
+        buffer->append(binary, size);
+
+        this->builder = vp::Builder(*buffer);
+    }
+
     void Vpack::from_json(const char* json, size_t size)
     {
         vp::Parser parser;
@@ -39,7 +47,7 @@ namespace velocypack { namespace php {
     void Vpack::from_array(HashTable* array)
     {
         this->builder = vp::Builder();
-        this->php_array_to_vpack(array, &this->builder);
+        Vpack::php_array_to_vpack(array, &this->builder);
     }
 
     std::string Vpack::to_json()
@@ -65,6 +73,17 @@ namespace velocypack { namespace php {
         return vp::HexDump(this->builder.slice()).toString().c_str();
     }
 
+    std::string Vpack::to_binary()
+    {
+        auto buffer = this->builder.buffer();
+        return buffer->toString();
+    }
+
+    zval* Vpack::to_array(zval* return_value)
+    {
+        Vpack::vpack_to_php_value(this->builder.slice(), return_value);
+    }
+
     void Vpack::access(zval* return_value, HashTable* accessor)
     {
         //try {
@@ -83,7 +102,7 @@ namespace velocypack { namespace php {
 
             } ZEND_HASH_FOREACH_END();
 
-            this->vpack_to_php_value(tmpSlice, return_value);
+            Vpack::vpack_to_php_value(tmpSlice, return_value);
         //}
         //catch(const vp::Exception& e) {
             //@todo exception
@@ -93,7 +112,7 @@ namespace velocypack { namespace php {
     void Vpack::access(zval* return_value, const char* accessor)
     {
         //try {
-            this->vpack_to_php_value(this->builder.slice().get(accessor), return_value);
+            Vpack::vpack_to_php_value(this->builder.slice().get(accessor), return_value);
         //}
         //catch(const vp::Exception& e) {
             //@todo exception
@@ -102,7 +121,7 @@ namespace velocypack { namespace php {
 
     void Vpack::access(zval* return_value, int accessor)
     {
-        this->vpack_to_php_value(this->builder.slice().at(accessor), return_value);
+        Vpack::vpack_to_php_value(this->builder.slice().at(accessor), return_value);
     }
 
 
@@ -129,6 +148,14 @@ namespace velocypack { namespace php {
 
             case vp::ValueType::Null:
                 ZVAL_NULL(value);
+                break;
+
+            case vp::ValueType::Bool:
+                if(slice.getBool()) {
+                    ZVAL_TRUE(value);
+                } else {
+                    ZVAL_FALSE(value);
+                }
                 break;
 
             case vp::ValueType::Array:

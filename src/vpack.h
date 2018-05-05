@@ -20,11 +20,14 @@ namespace velocypack { namespace php {
         static zend_object* create_object(zend_class_entry* ce TSRMLS_CC);
         static Vpack* fetch_object(zend_object* obj);
 
+        void from_binary(const char* binary, size_t size);
         void from_json(const char* json, size_t size);
         void from_array(HashTable* array);
 
         std::string to_json();
         std::string to_hex();
+        std::string to_binary();
+        zval* to_array(zval* return_value);
 
         void access(zval* return_value, HashTable* accessor);
         void access(zval* return_value, const char* accessor);
