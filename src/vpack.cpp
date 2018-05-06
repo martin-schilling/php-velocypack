@@ -70,13 +70,12 @@ namespace velocypack { namespace php {
 
     std::string Vpack::to_hex()
     {
-        return vp::HexDump(this->builder.slice()).toString().c_str();
+        return vp::HexDump(this->builder.slice()).toString();
     }
 
     std::string Vpack::to_binary()
     {
-        auto buffer = this->builder.buffer();
-        return buffer->toString();
+        return this->builder.buffer()->toString();
     }
 
     zval* Vpack::to_array(zval* return_value)

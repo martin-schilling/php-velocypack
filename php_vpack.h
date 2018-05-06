@@ -99,7 +99,7 @@ namespace {
         velocypack::php::Vpack* intern = Z_OBJECT_VPACK_P(getThis());
         auto binary = intern->to_binary();
 
-        RETURN_STRING(binary.c_str());
+        RETURN_STRINGL(binary.data(), binary.size());
     }
 
     PHP_METHOD(Vpack, toArray)
