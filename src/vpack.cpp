@@ -118,9 +118,46 @@ namespace velocypack { namespace php {
         //}
     }
 
+    //Assoc arrays get converted to objets, therefore if the accessor is an integer and the 
+    //slice is an object we convert the integer to a string and check for the property.
     void Vpack::access(zval* return_value, int accessor)
     {
-        Vpack::vpack_to_php_value(this->builder.slice().at(accessor), return_value);
+        auto slice = this->builder.slice();
+        
+        if(slice.isObject()) {
+            std::string key_accessor = std::to_string(accessor);
+            this->access(return_value, key_accessor.c_str());
+        } else if(slice.isArray()) {
+            Vpack::vpack_to_php_value(this->builder.slice().at(accessor), return_value);
+        } else {
+            //@todo exception
+        }
+    }
+
+    bool Vpack::exists(const char* accessor) 
+    {
+        return this->builder.slice().hasKey(accessor);
+    }
+
+    //Assoc arrays get converted to objets, therefore if the accessor is an integer and the 
+    //slice is an object we convert the integer to a string and check for the property.
+    bool Vpack::exists(int accessor) 
+    {
+        auto slice = this->builder.slice();
+        
+        if(slice.isObject()) {
+            std::string key_accessor = std::to_string(accessor);
+            return this->builder.slice().hasKey(key_accessor);
+        } else if(slice.isArray()) {
+            try {
+                this->builder.slice().at(accessor);
+            } catch(const vp::Exception &ex) {
+                return false;
+            }
+            return true;
+        } else {
+            //@todo exception
+        }
     }
 
 
@@ -168,6 +205,8 @@ namespace velocypack { namespace php {
                 }
                 break;
 
+            //@todo I think we need to check if the key is numeric and convert it to a number
+            //Note: this is the behavior of json_decode as well
             case vp::ValueType::Object:
                 {
                     array_init(value);

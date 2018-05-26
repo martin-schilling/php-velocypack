@@ -1,5 +1,27 @@
 # php-velocypack
 
+## Installation
+### Initial Setup
+```
+$ git clone https://github.com/martin-schilling/php-velocypack.git
+$ cd php-velocypack
+$ ./clone_velocypack
+$ docker-compose build extension-builder
+```
+### Compile Extension
+```
+$ docker-compose run --rm extension-builder
+$ docker-compose build php 
+```
+### Run Tests
+```
+$ docker-compose run --rm php make test
+```
+### Run Script
+```
+$ docker-compose run --rm php php script_name.php
+```
+
 ## Usage
 ### Creating a Vpack
 ```php

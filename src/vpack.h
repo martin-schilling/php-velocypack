@@ -32,6 +32,9 @@ namespace velocypack { namespace php {
         void access(zval* return_value, HashTable* accessor);
         void access(zval* return_value, const char* accessor);
         void access(zval* return_value, int accessor);
+
+        bool exists(const char* accessor);
+        bool exists(int accessor);
     private:
         static void vpack_to_php_value(const vp::Slice& slice, zval* value);
         static void php_array_to_vpack(HashTable* array, vp::Builder* builder);

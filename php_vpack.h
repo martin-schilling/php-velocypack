@@ -2,6 +2,7 @@
 
 extern "C" {
 #include <php.h>
+#include <Zend/zend_interfaces.h>
 }
 
 #include "src/vpack.h"
@@ -139,6 +140,62 @@ namespace {
         }
     }
 
+    PHP_METHOD(Vpack, offsetExists) 
+    {
+        zval* key;
+        int key_index;
+        char* key_string;
+
+        if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &key) == FAILURE) {
+            return;
+        }
+
+        velocypack::php::Vpack* intern = Z_OBJECT_VPACK_P(getThis());
+
+        if(Z_TYPE_P(key) == IS_STRING) {
+            key_string = Z_STRVAL_P(key);
+            RETURN_BOOL(intern->exists(key_string));
+        } else if(Z_TYPE_P(key) == IS_LONG) {
+            key_index = Z_LVAL_P(key);
+            RETURN_BOOL(intern->exists(key_index));
+        } else {
+            //@todo exception
+        }
+    }
+
+    PHP_METHOD(Vpack, offsetGet)
+    {
+        zval* key;
+        int key_index;
+        char* key_string;
+
+        if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &key) == FAILURE) {
+            return;
+        }
+
+        velocypack::php::Vpack* intern = Z_OBJECT_VPACK_P(getThis());
+
+        if(Z_TYPE_P(key) == IS_STRING) {
+            key_string = Z_STRVAL_P(key);
+            intern->access(return_value, key_string);
+        } else if(Z_TYPE_P(key) == IS_LONG) {
+            key_index = Z_LVAL_P(key);
+            intern->access(return_value, key_index);
+        } else {
+            //@todo exception
+        }
+    }
+
+    PHP_METHOD(Vpack, offsetSet) 
+    {
+
+    }
+
+    PHP_METHOD(Vpack, offsetUnset) 
+    {
+
+    }
+
     ZEND_BEGIN_ARG_INFO_EX(velocypack_vpack_void, 0, 0, 0)
     ZEND_END_ARG_INFO()
 
@@ -154,6 +211,15 @@ namespace {
         ZEND_ARG_INFO(0, accessor)
     ZEND_END_ARG_INFO()
 
+    ZEND_BEGIN_ARG_INFO_EX(velocypack_vpack_offset_get, 0, 0, 1)
+        ZEND_ARG_INFO(0, key)
+    ZEND_END_ARG_INFO()
+
+    ZEND_BEGIN_ARG_INFO_EX(velocypack_vpack_offset_set, 0, 0, 2)
+        ZEND_ARG_INFO(0, key)
+        ZEND_ARG_INFO(0, value)
+    ZEND_END_ARG_INFO()
+
     zend_function_entry vpack_methods[] = {
         PHP_ME(Vpack, __construct, velocypack_vpack_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
         PHP_ME(Vpack, fromBinary, velocypack_vpack_from_json, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -164,6 +230,11 @@ namespace {
         PHP_ME(Vpack, toBinary, velocypack_vpack_void, ZEND_ACC_PUBLIC)
         PHP_ME(Vpack, toArray, velocypack_vpack_void, ZEND_ACC_PUBLIC)
         PHP_ME(Vpack, access, velocypack_vpack_access, ZEND_ACC_PUBLIC)
+        /* ArrayAccess */
+        PHP_ME(Vpack, offsetExists, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
+        PHP_ME(Vpack, offsetGet, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
+        PHP_ME(Vpack, offsetSet, velocypack_vpack_offset_set, ZEND_ACC_PUBLIC)
+        PHP_ME(Vpack, offsetUnset, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
         PHP_FE_END
     };
 
@@ -177,5 +248,7 @@ namespace {
 
         memcpy(&velocypack::php::Vpack::handler_vpack, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
         velocypack::php::Vpack::handler_vpack.offset = XtOffsetOf(velocypack::php::Vpack, std);
+
+        zend_class_implements(vpack_ce, 1, zend_ce_arrayaccess);
     }
 }
