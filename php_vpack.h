@@ -196,6 +196,17 @@ namespace {
 
     }
 
+    PHP_METHOD(Vpack, count)
+    {
+        if(zend_parse_parameters_none() == FAILURE) {
+            return;
+        }
+
+        velocypack::php::Vpack* intern = Z_OBJECT_VPACK_P(getThis());
+
+        RETURN_LONG(intern->count());
+    }
+
     ZEND_BEGIN_ARG_INFO_EX(velocypack_vpack_void, 0, 0, 0)
     ZEND_END_ARG_INFO()
 
@@ -235,6 +246,8 @@ namespace {
         PHP_ME(Vpack, offsetGet, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
         PHP_ME(Vpack, offsetSet, velocypack_vpack_offset_set, ZEND_ACC_PUBLIC)
         PHP_ME(Vpack, offsetUnset, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
+        /* Countable */
+        PHP_ME(Vpack, count, velocypack_vpack_void, ZEND_ACC_PUBLIC)
         PHP_FE_END
     };
 
@@ -250,5 +263,6 @@ namespace {
         velocypack::php::Vpack::handler_vpack.offset = XtOffsetOf(velocypack::php::Vpack, std);
 
         zend_class_implements(vpack_ce, 1, zend_ce_arrayaccess);
+        zend_class_implements(vpack_ce, 1, zend_ce_countable);
     }
 }

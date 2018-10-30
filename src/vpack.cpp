@@ -160,6 +160,13 @@ namespace velocypack { namespace php {
         }
     }
 
+    int Vpack::count()
+    {
+        auto slice = this->builder.slice();
+
+        return slice.length();
+    }
+
 
 
     void Vpack::vpack_to_php_value(const vp::Slice& slice, zval* value)
