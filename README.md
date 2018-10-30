@@ -1,5 +1,7 @@
 # php-velocypack
 
+[![Build Status](https://travis-ci.com/martin-schilling/php-velocypack.svg?branch=master)](https://travis-ci.com/martin-schilling/php-velocypack)
+
 This is still under heavy development but feel free to try the extension and report any bugs you might encounter.
 
 ## Installation
