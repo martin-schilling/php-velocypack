@@ -1,5 +1,7 @@
 # php-velocypack
 
+This is still under heavy development but feel free to try the extension and report any bugs you might encounter.
+
 ## Installation
 ### Initial Setup
 ```
