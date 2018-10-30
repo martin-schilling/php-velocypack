@@ -1,0 +1,16 @@
+sudo: required
+language: php
+
+php:
+  - 7.2
+  - 7.1
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y gdb valgrind
+  - sudo apt-get install -y git build-essential autoconf automake libtool bison re2c cmake
+  - sudo chmod +x ./travis/compile.sh
+  - "./travis/compile.sh"
+
+script:
+  - REPORT_EXIT_STATUS=1 TEST_PHP_ARGS="-q --show-diff" make test
