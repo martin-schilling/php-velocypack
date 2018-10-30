@@ -3,6 +3,10 @@
 extern "C" {
 #include <php.h>
 #include <Zend/zend_interfaces.h>
+
+#if PHP_VERSION_ID < 72000
+#include <ext/spl/spl_iterators.h>
+#endif
 }
 
 #include "src/vpack.h"
@@ -263,6 +267,11 @@ namespace {
         velocypack::php::Vpack::handler_vpack.offset = XtOffsetOf(velocypack::php::Vpack, std);
 
         zend_class_implements(vpack_ce, 1, zend_ce_arrayaccess);
+
+        #if PHP_VERSION_ID < 72000
+        zend_class_implements(vpack_ce, 1, spl_ce_Countable);
+        #else
         zend_class_implements(vpack_ce, 1, zend_ce_countable);
+        #endif
     }
 }
