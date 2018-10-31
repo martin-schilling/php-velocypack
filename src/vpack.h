@@ -20,6 +20,9 @@ namespace velocypack { namespace php {
         static zend_object* create_object(zend_class_entry* ce TSRMLS_CC);
         static Vpack* fetch_object(zend_object* obj);
 
+        Vpack();
+        Vpack(vp::Builder builder);
+
         void from_binary(const char* binary, size_t size);
         void from_json(const char* json, size_t size);
         void from_array(HashTable* array);
@@ -37,6 +40,7 @@ namespace velocypack { namespace php {
         bool exists(int accessor);
 
         int count();
+
     private:
         static void vpack_to_php_value(const vp::Slice& slice, zval* value);
         static void php_array_to_vpack(HashTable* array, vp::Builder* builder);

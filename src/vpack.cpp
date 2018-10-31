@@ -1,5 +1,7 @@
 #include "vpack.h"
 
+extern zend_class_entry *vpack_ce;
+
 namespace velocypack { namespace php {
 
     zend_object_handlers Vpack::handler_vpack = zend_object_handlers();
@@ -17,6 +19,14 @@ namespace velocypack { namespace php {
     Vpack* Vpack::fetch_object(zend_object* obj)
     {
         return (Vpack *)((char *)obj - XtOffsetOf(Vpack, std));
+    }
+
+    Vpack::Vpack()
+    {
+    }
+
+    Vpack::Vpack(vp::Builder builder): builder(builder)
+    {
     }
 
     void Vpack::from_binary(const char* binary, size_t size)
@@ -101,7 +111,13 @@ namespace velocypack { namespace php {
 
             } ZEND_HASH_FOREACH_END();
 
-            Vpack::vpack_to_php_value(tmpSlice, return_value);
+            if (tmpSlice.isObject() || tmpSlice.isArray()) {
+                object_init_ex(return_value, vpack_ce);
+                auto intern = Vpack::fetch_object(Z_OBJ_P(return_value));
+                new (intern) Vpack(vp::Builder(tmpSlice));
+            } else {
+                Vpack::vpack_to_php_value(tmpSlice, return_value);
+            }
         //}
         //catch(const vp::Exception& e) {
             //@todo exception
@@ -111,7 +127,15 @@ namespace velocypack { namespace php {
     void Vpack::access(zval* return_value, const char* accessor)
     {
         //try {
-            Vpack::vpack_to_php_value(this->builder.slice().get(accessor), return_value);
+            auto tmpSlice = this->builder.slice().get(accessor);
+
+            if (tmpSlice.isObject() || tmpSlice.isArray()) {
+                object_init_ex(return_value, vpack_ce);
+                auto intern = Vpack::fetch_object(Z_OBJ_P(return_value));
+                new (intern) Vpack(vp::Builder(tmpSlice));
+            } else {
+                Vpack::vpack_to_php_value(tmpSlice, return_value);
+            }
         //}
         //catch(const vp::Exception& e) {
             //@todo exception
@@ -122,13 +146,21 @@ namespace velocypack { namespace php {
     //slice is an object we convert the integer to a string and check for the property.
     void Vpack::access(zval* return_value, int accessor)
     {
-        auto slice = this->builder.slice();
+        auto topLevelSlice = this->builder.slice();
         
-        if(slice.isObject()) {
+        if(topLevelSlice.isObject()) {
             std::string key_accessor = std::to_string(accessor);
             this->access(return_value, key_accessor.c_str());
-        } else if(slice.isArray()) {
-            Vpack::vpack_to_php_value(this->builder.slice().at(accessor), return_value);
+        } else if(topLevelSlice.isArray()) {
+            auto tmpSlice = topLevelSlice.at(accessor);
+
+            if (tmpSlice.isObject() || tmpSlice.isArray()) {
+                object_init_ex(return_value, vpack_ce);
+                auto intern = Vpack::fetch_object(Z_OBJ_P(return_value));
+                new (intern) Vpack(vp::Builder(tmpSlice));
+            } else {
+                Vpack::vpack_to_php_value(tmpSlice, return_value);
+            }
         } else {
             //@todo exception
         }

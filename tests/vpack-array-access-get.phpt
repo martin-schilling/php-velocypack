@@ -29,15 +29,19 @@ $vpack = \Velocypack\Vpack::fromArray([
     "obj" => new \stdClass()
 ]);
 
+$subVpack = $vpack[2];
+var_dump($subVpack);
+var_dump($subVpack->toArray());
+
 var_dump($vpack["null"]);
-var_dump($vpack[2]);
 
 $vpackArray = \Velocypack\Vpack::fromArray([10, "test", true]);
 var_dump($vpackArray[2]);
 ?>
 
 --EXPECTF--
-NULL
+object(Velocypack\Vpack)#1 (0) {
+}
 array(3) {
   [0]=>
   int(23)
@@ -46,4 +50,5 @@ array(3) {
   [2]=>
   int(10)
 }
+NULL
 bool(true)
