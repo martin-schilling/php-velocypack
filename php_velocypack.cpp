@@ -2,6 +2,7 @@
 
 zend_class_entry *vpack_interface_ce;
 zend_class_entry *vpack_ce;
+zend_class_entry *immutable_vpack_ce;
 
 #define Z_OBJECT_VPACK(zo) (velocypack::php::Vpack::fetch_object(zo))
 #define Z_OBJECT_VPACK_P(zo) (velocypack::php::Vpack::fetch_object(Z_OBJ_P(zo)))
@@ -13,6 +14,7 @@ PHP_MINIT_FUNCTION(velocypack)
 {
     init_vpack_interface_ce();
     init_vpack_ce();
+    init_immutable_vpack_ce();
 
     return SUCCESS;
 }

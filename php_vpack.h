@@ -207,6 +207,69 @@ namespace {
         RETURN_LONG(intern->count());
     }
 
+    /* ImmutableVpack */
+
+    PHP_METHOD(ImmutableVpack, fromBinary)
+    {
+        char* binary;
+        size_t len;
+
+        if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &binary, &len) == FAILURE) {
+            return;
+        }
+
+        object_init_ex(return_value, immutable_vpack_ce);
+        auto intern = Z_OBJECT_VPACK(Z_OBJ_P(return_value));
+
+        intern->from_binary(binary, len);
+    }
+
+    PHP_METHOD(ImmutableVpack, fromJson)
+    {
+        char* json;
+        size_t len;
+
+        if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &json, &len) == FAILURE) {
+            return;
+        }
+
+        object_init_ex(return_value, immutable_vpack_ce);
+        auto intern = Z_OBJECT_VPACK(Z_OBJ_P(return_value));
+
+        intern->from_json(json, len);
+    }
+
+    PHP_METHOD(ImmutableVpack, fromArray)
+    {
+        zval *array_value;
+        HashTable *array;
+
+        if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &array_value) == FAILURE) {
+            return;
+        }
+
+        array = Z_ARRVAL_P(array_value);
+
+        object_init_ex(return_value, immutable_vpack_ce);
+        auto intern = Z_OBJECT_VPACK(Z_OBJ_P(return_value));
+
+        intern->from_array(array);
+    }
+
+    /* Function aliases for ImmutableVpack */
+    const auto zim_ImmutableVpack___construct = zim_Vpack___construct;
+    const auto zim_ImmutableVpack_toJson = zim_Vpack_toJson;
+    const auto zim_ImmutableVpack_toHex = zim_Vpack_toHex;
+    const auto zim_ImmutableVpack_toBinary = zim_Vpack_toBinary;
+    const auto zim_ImmutableVpack_toArray = zim_Vpack_toArray;
+    const auto zim_ImmutableVpack_access = zim_Vpack_access;
+    const auto zim_ImmutableVpack_offsetExists = zim_Vpack_offsetExists;
+    const auto zim_ImmutableVpack_offsetGet = zim_Vpack_offsetGet;
+    const auto zim_ImmutableVpack_offsetSet = zim_Vpack_offsetSet;
+    const auto zim_ImmutableVpack_offsetUnset = zim_Vpack_offsetUnset;
+    const auto zim_ImmutableVpack_count = zim_Vpack_count;
+
+
     ZEND_BEGIN_ARG_INFO_EX(velocypack_vpack_void, 0, 0, 0)
     ZEND_END_ARG_INFO()
 
@@ -251,6 +314,26 @@ namespace {
         PHP_FE_END
     };
 
+    zend_function_entry immutable_vpack_methods[] = {
+        PHP_ME(ImmutableVpack, __construct, velocypack_vpack_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+        PHP_ME(ImmutableVpack, fromBinary, velocypack_vpack_from_json, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+        PHP_ME(ImmutableVpack, fromJson, velocypack_vpack_from_json, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+        PHP_ME(ImmutableVpack, fromArray, velocypack_vpack_from_array, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+        PHP_ME(ImmutableVpack, toJson, velocypack_vpack_void, ZEND_ACC_PUBLIC)
+        PHP_ME(ImmutableVpack, toHex, velocypack_vpack_void, ZEND_ACC_PUBLIC)
+        PHP_ME(ImmutableVpack, toBinary, velocypack_vpack_void, ZEND_ACC_PUBLIC)
+        PHP_ME(ImmutableVpack, toArray, velocypack_vpack_void, ZEND_ACC_PUBLIC)
+        PHP_ME(ImmutableVpack, access, velocypack_vpack_access, ZEND_ACC_PUBLIC)
+        /* ArrayAccess */
+        PHP_ME(ImmutableVpack, offsetExists, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
+        PHP_ME(ImmutableVpack, offsetGet, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
+        PHP_ME(ImmutableVpack, offsetSet, velocypack_vpack_offset_set, ZEND_ACC_PUBLIC)
+        PHP_ME(ImmutableVpack, offsetUnset, velocypack_vpack_offset_get, ZEND_ACC_PUBLIC)
+        /* Countable */
+        PHP_ME(ImmutableVpack, count, velocypack_vpack_void, ZEND_ACC_PUBLIC)
+        PHP_FE_END
+    };
+
     void init_vpack_ce()
     {
         zend_class_entry ce;
@@ -263,5 +346,19 @@ namespace {
         velocypack::php::Vpack::handler_vpack.offset = XtOffsetOf(velocypack::php::Vpack, std);
 
         zend_class_implements(vpack_ce, 1, vpack_interface_ce);
+    }
+
+    void init_immutable_vpack_ce()
+    {
+        zend_class_entry ce;
+
+        INIT_CLASS_ENTRY(ce, "Velocypack\\ImmutableVpack", immutable_vpack_methods);
+        immutable_vpack_ce = zend_register_internal_class(&ce TSRMLS_CC);
+        immutable_vpack_ce->create_object = velocypack::php::Vpack::create_object;
+
+        memcpy(&velocypack::php::Vpack::handler_vpack, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+        velocypack::php::Vpack::handler_vpack.offset = XtOffsetOf(velocypack::php::Vpack, std);
+
+        zend_class_implements(immutable_vpack_ce, 1, vpack_interface_ce);
     }
 }
