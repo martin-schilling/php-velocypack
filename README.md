@@ -4,6 +4,8 @@
 
 This is still under heavy development but feel free to try the extension and report any bugs you might encounter.
 
+This extension does not aim to replicate the library interface of the original velocypack [C++ implementation](https://github.com/arangodb/velocypack). It rather wraps the C++ velocypack library to provide a way to easily interact with Velocypack data from inside PHP. For an overview of the classes, interfaces and the functionality they provide take a look at the [PhpStorm Stubs](https://github.com/martin-schilling/php-velocypack/blob/master/phpstorm-stubs/php-vpack.php)
+
 ## Installation
 ### Initial Setup
 ```
