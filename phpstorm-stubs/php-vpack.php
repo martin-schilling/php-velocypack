@@ -113,4 +113,12 @@ namespace Velocypack {
         {
         }
     }
+
+    class Exception extends \Exception
+    {
+    }
+
+    class InvalidArgumentException extends Exception
+    {
+    }
 }
