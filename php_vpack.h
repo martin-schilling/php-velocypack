@@ -11,6 +11,8 @@ namespace {
 
     PHP_METHOD(Vpack, __construct)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         velocypack::php::Vpack* intern;
 
         if(zend_parse_parameters_none() == FAILURE) {
@@ -18,10 +20,14 @@ namespace {
         }
 
         intern = Z_OBJECT_VPACK_P(getThis());
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, fromBinary)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         char* binary;
         size_t len;
 
@@ -33,10 +39,14 @@ namespace {
         auto intern = Z_OBJECT_VPACK(Z_OBJ_P(return_value));
 
         intern->from_binary(binary, len);
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, fromJson)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         char* json;
         size_t len;
 
@@ -48,10 +58,14 @@ namespace {
         auto intern = Z_OBJECT_VPACK(Z_OBJ_P(return_value));
 
         intern->from_json(json, len);
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, fromArray)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         zval *array_value;
         HashTable *array;
 
@@ -65,10 +79,14 @@ namespace {
         auto intern = Z_OBJECT_VPACK(Z_OBJ_P(return_value));
 
         intern->from_array(array);
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, toJson)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         if(zend_parse_parameters_none() == FAILURE) {
             return;
         }
@@ -77,10 +95,14 @@ namespace {
 
         auto json = intern->to_json();
         RETURN_STRING(json.c_str());
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, toHex)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         if(zend_parse_parameters_none() == FAILURE) {
             return;
         }
@@ -89,10 +111,14 @@ namespace {
         auto hex = intern->to_hex();
 
         RETURN_STRING(hex.c_str());
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, toBinary)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         if(zend_parse_parameters_none() == FAILURE) {
             return;
         }
@@ -101,20 +127,28 @@ namespace {
         auto binary = intern->to_binary();
 
         RETURN_STRINGL(binary.data(), binary.size());
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, toArray)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         if(zend_parse_parameters_none() == FAILURE) {
             return;
         }
 
         velocypack::php::Vpack* intern = Z_OBJECT_VPACK_P(getThis());
         intern->to_array(return_value);
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, access)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         zval *accessor;
         HashTable *accessor_ht;
         const char* accessor_string;
@@ -136,12 +170,16 @@ namespace {
             accessor_ht = Z_ARRVAL_P(accessor);
             intern->access(return_value, accessor_ht);
         } else {
-            //@todo exception
+            throw std::invalid_argument("Invalid accessor type provided");
         }
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, offsetExists) 
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         zval* key;
         int key_index;
         char* key_string;
@@ -159,12 +197,16 @@ namespace {
             key_index = Z_LVAL_P(key);
             RETURN_BOOL(intern->exists(key_index));
         } else {
-            //@todo exception
+            throw std::invalid_argument("Invalid offset type provided");
         }
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, offsetGet)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         zval* key;
         int key_index;
         char* key_string;
@@ -182,22 +224,30 @@ namespace {
             key_index = Z_LVAL_P(key);
             intern->access(return_value, key_index);
         } else {
-            //@todo exception
+            throw std::invalid_argument("Invalid offset type provided");
         }
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, offsetSet) 
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
 
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, offsetUnset) 
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
 
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     PHP_METHOD(Vpack, count)
     {
+        VELOCYPACK_EXCEPTION_CONVERTER_TRY
+
         if(zend_parse_parameters_none() == FAILURE) {
             return;
         }
@@ -205,6 +255,8 @@ namespace {
         velocypack::php::Vpack* intern = Z_OBJECT_VPACK_P(getThis());
 
         RETURN_LONG(intern->count());
+
+        VELOCYPACK_EXCEPTION_CONVERTER_CATCH
     }
 
     ZEND_BEGIN_ARG_INFO_EX(velocypack_vpack_void, 0, 0, 0)
