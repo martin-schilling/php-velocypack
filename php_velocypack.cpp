@@ -2,15 +2,19 @@
 
 zend_class_entry *vpack_interface_ce;
 zend_class_entry *vpack_ce;
+zend_class_entry *vpack_exception_ce;
+zend_class_entry *vpack_invalid_argument_exception_ce;
 
 #define Z_OBJECT_VPACK(zo) (velocypack::php::Vpack::fetch_object(zo))
 #define Z_OBJECT_VPACK_P(zo) (velocypack::php::Vpack::fetch_object(Z_OBJ_P(zo)))
 
+#include "php_exception.h"
 #include "php_vpack_interface.h"
 #include "php_vpack.h"
 
 PHP_MINIT_FUNCTION(velocypack)
 {
+    init_vpack_exception_ces();
     init_vpack_interface_ce();
     init_vpack_ce();
 
