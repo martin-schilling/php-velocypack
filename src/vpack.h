@@ -46,6 +46,7 @@ namespace velocypack { namespace php {
         static void php_array_to_vpack(HashTable* array, vp::Builder* builder);
         static void php_numeric_array_to_vpack(HashTable* array, vp::Builder* builder);
         static void php_assoc_array_to_vpack(HashTable* array, vp::Builder* builder);
+        static bool php_array_is_numeric(HashTable* array);
     };
 
 }}

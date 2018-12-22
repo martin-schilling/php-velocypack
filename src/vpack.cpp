@@ -277,7 +277,7 @@ namespace velocypack { namespace php {
 
     void Vpack::php_array_to_vpack(HashTable* array, vp::Builder* builder)
     {
-        if(HT_IS_PACKED(array) && HT_IS_WITHOUT_HOLES(array)) {
+        if(Vpack::php_array_is_numeric(array)) {
             builder->add(vp::Value(vp::ValueType::Array));
             Vpack::php_numeric_array_to_vpack(array, builder);
             builder->close();
@@ -314,7 +314,7 @@ namespace velocypack { namespace php {
                     builder->add(vp::Value(vp::ValueType::Null));
                     break;
                 case IS_ARRAY:
-                    if(HT_IS_PACKED(Z_ARRVAL_P(data)) && HT_IS_WITHOUT_HOLES(Z_ARRVAL_P(data))) {
+                    if(Vpack::php_array_is_numeric(Z_ARRVAL_P(data))) {
                         builder->add(vp::Value(vp::ValueType::Array));
                         Vpack::php_numeric_array_to_vpack(Z_ARRVAL_P(data), builder);
                         builder->close();
@@ -373,7 +373,7 @@ namespace velocypack { namespace php {
                     builder->add(vpackKey, vp::Value(vp::ValueType::Null));
                     break;
                 case IS_ARRAY:
-                    if(HT_IS_PACKED(Z_ARRVAL_P(data)) && HT_IS_WITHOUT_HOLES(Z_ARRVAL_P(data))) {
+                    if(Vpack::php_array_is_numeric(Z_ARRVAL_P(data))) {
                         builder->add(vpackKey, vp::Value(vp::ValueType::Array));
                         Vpack::php_numeric_array_to_vpack(Z_ARRVAL_P(data), builder);
                         builder->close();
@@ -392,5 +392,33 @@ namespace velocypack { namespace php {
             }
 
         } ZEND_HASH_FOREACH_END();
+    }
+
+    bool Vpack::php_array_is_numeric(HashTable* array)
+    {
+        if (zend_hash_num_elements(array) < 1) {
+            return true;
+        }
+
+        // This works most of the time but not always, see vpack-from-array-recognizes-numeric-array-correctly.phpt
+        if (HT_IS_PACKED(array) && HT_IS_WITHOUT_HOLES(array)) {
+            return true;
+        }
+
+        zend_string *key;
+        zend_ulong index;
+        zend_ulong idx = 0;
+        ZEND_HASH_FOREACH_KEY(array, index, key) {
+            if (key) {
+                return false;
+            } else {
+                if (index != idx) {
+                    return false;
+                }
+            }
+            idx++;
+        } ZEND_HASH_FOREACH_END();
+
+        return true;
     }
 }}
