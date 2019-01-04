@@ -284,7 +284,7 @@ namespace {
     ZEND_END_ARG_INFO()
 
     zend_function_entry vpack_methods[] = {
-        PHP_ME(Vpack, __construct, velocypack_vpack_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+        PHP_ME(Vpack, __construct, velocypack_vpack_void, ZEND_ACC_PUBLIC)
         PHP_ME(Vpack, fromBinary, velocypack_vpack_from_json, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
         PHP_ME(Vpack, fromJson, velocypack_vpack_from_json, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
         PHP_ME(Vpack, fromArray, velocypack_vpack_from_array, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
