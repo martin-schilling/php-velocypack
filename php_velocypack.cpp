@@ -18,6 +18,9 @@ PHP_MINIT_FUNCTION(velocypack)
     init_vpack_interface_ce();
     init_vpack_ce();
 
+    REGISTER_LONG_CONSTANT("Velocypack\\Option\\BUILD_UNINDEXED_OBJECTS", 0, CONST_PERSISTENT | CONST_CS);
+    REGISTER_LONG_CONSTANT("Velocypack\\Option\\BUILD_UNINDEXED_ARRAYS", 1, CONST_PERSISTENT | CONST_CS);
+
     return SUCCESS;
 }
 

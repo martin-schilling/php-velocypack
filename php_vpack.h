@@ -66,10 +66,11 @@ namespace {
     {
         VELOCYPACK_EXCEPTION_CONVERTER_TRY
 
-        zval *array_value;
-        HashTable *array;
+        zval* array_value;
+        HashTable* array;
+        HashTable* options = NULL;
 
-        if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &array_value) == FAILURE) {
+        if(zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|h", &array_value, &options) == FAILURE) {
             return;
         }
 
@@ -77,6 +78,10 @@ namespace {
 
         object_init_ex(return_value, vpack_ce);
         auto intern = Z_OBJECT_VPACK(Z_OBJ_P(return_value));
+
+        if (options) {
+            intern->set_options(options);
+        }
 
         intern->from_array(array);
 

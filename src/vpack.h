@@ -14,6 +14,7 @@ namespace velocypack { namespace php {
     {
     public:
         vp::Builder builder;
+        vp::Options options;
         zend_object std;
 
         static zend_object_handlers handler_vpack;
@@ -22,6 +23,8 @@ namespace velocypack { namespace php {
 
         Vpack();
         Vpack(vp::Builder builder);
+
+        void set_options(HashTable* options);
 
         void from_binary(const char* binary, size_t size);
         void from_json(const char* json, size_t size);
