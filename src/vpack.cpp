@@ -59,7 +59,7 @@ namespace velocypack { namespace php {
 
     void Vpack::from_json(const char* json, size_t size)
     {
-        vp::Parser parser;
+        vp::Parser parser(&this->options);
 
         //try {
             parser.parse(json, size);
