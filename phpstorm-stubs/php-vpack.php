@@ -9,7 +9,7 @@ namespace Velocypack {
 
     interface VpackInterface extends \Countable, \ArrayAccess {
         public static function fromBinary(string $binary): self;
-        public static function fromJson(string $json): self;
+        public static function fromJson(string $json, ?array $options = null): self;
         public static function fromArray(array $array, ?array $options = null): self;
         public function toJson(): string;
         public function toHex(): string;
@@ -30,15 +30,16 @@ namespace Velocypack {
 
         /**
          * @param string $json
+         * @param array|null $options
          * @return \Velocypack\Vpack
          */
-        public static function fromJson(string $json): self
+        public static function fromJson(string $json, ?array $options = null): self
         {
         }
 
         /**
          * @param array $array
-         * @param array $options
+         * @param array|null $options
          * @return \Velocypack\Vpack
          */
         public static function fromArray(array $array, ?array $options = null): self
