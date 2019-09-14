@@ -8,6 +8,10 @@ php:
   - 7.2
   - 7.1
 
+matrix:
+  allow_failures:
+  - php: nightly
+
 addons:
   apt:
     packages:

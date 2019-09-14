@@ -29,6 +29,26 @@ namespace velocypack { namespace php {
     {
     }
 
+    void Vpack::set_options(HashTable* options)
+    {
+        zend_ulong key;
+        zval* data;
+
+        ZEND_HASH_FOREACH_NUM_KEY_VAL(options, key, data) {
+            switch (key) {
+                case 0:
+                    this->options.buildUnindexedObjects = (Z_TYPE_P(data) == IS_TRUE);
+                    break;
+                case 1:
+                    this->options.buildUnindexedArrays = (Z_TYPE_P(data) == IS_TRUE);
+                    break;
+                default:
+                    // @todo exception
+                    break;
+            }
+        } ZEND_HASH_FOREACH_END();
+    }
+
     void Vpack::from_binary(const char* binary, size_t size)
     {
         vp::Buffer<uint8_t>* buffer = new vp::Buffer<uint8_t>();
@@ -39,7 +59,7 @@ namespace velocypack { namespace php {
 
     void Vpack::from_json(const char* json, size_t size)
     {
-        vp::Parser parser;
+        vp::Parser parser(&this->options);
 
         //try {
             parser.parse(json, size);
@@ -56,7 +76,7 @@ namespace velocypack { namespace php {
 
     void Vpack::from_array(HashTable* array)
     {
-        this->builder = vp::Builder();
+        this->builder = vp::Builder(&this->options);
         Vpack::php_array_to_vpack(array, &this->builder);
     }
 

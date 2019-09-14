@@ -1,11 +1,16 @@
 <?php
 
+namespace Velocypack\Option {
+    const BUILD_UNINDEXED_OBJECTS = 0;
+    const BUILD_UNINDEXED_ARRAYS = 1;
+}
+
 namespace Velocypack {
 
     interface VpackInterface extends \Countable, \ArrayAccess {
         public static function fromBinary(string $binary): self;
         public static function fromJson(string $json): self;
-        public static function fromArray(array $array): self;
+        public static function fromArray(array $array, ?array $options = null): self;
         public function toJson(): string;
         public function toHex(): string;
         public function toBinary(): string;
@@ -33,9 +38,10 @@ namespace Velocypack {
 
         /**
          * @param array $array
+         * @param array $options
          * @return \Velocypack\Vpack
          */
-        public static function fromArray(array $array): self
+        public static function fromArray(array $array, ?array $options = null): self
         {
         }
 
